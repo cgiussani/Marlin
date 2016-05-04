@@ -24,7 +24,7 @@
 // 13 Basque-Euskera
 
 #ifndef LANGUAGE_CHOICE
-#define LANGUAGE_CHOICE 7  // Pick your language from the list above
+#define LANGUAGE_CHOICE 1  // Pick your language from the list above
 #endif
 
 #define PROTOCOL_VERSION "1.0"
@@ -49,7 +49,7 @@
 	#endif
 #elif MOTHERBOARD == 80 || MOTHERBOARD == 80
 	#ifndef MACHINE_NAME
-		#define MACHINE_NAME "SHAREBOT NG 0.3"
+		#define MACHINE_NAME "SHAREBOT 42"
 		#define FIRMWARE_URL "http://www.sharebot.it"
 	#endif
 #elif MOTHERBOARD == 7 || MOTHERBOARD == 71
@@ -105,7 +105,7 @@
 	#define MSG_AUTO_HOME "Auto Home"
 	#define MSG_SET_ORIGIN "Set Origin"
 	#define MSG_PREHEAT_PLA "Preheat   "
-        #define MSG_PREHEAT_PLA0 "Preheat R "
+        #define MSG_PREHEAT_PLA0 "Preheat   "
         #define MSG_PREHEAT_PLA1 "Preheat L "
         #define MSG_PREHEAT_PLA2 "Preheat PLA 3"
         #define MSG_PREHEAT_PLA012 "Preheat All  "
@@ -301,12 +301,12 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
-	#define MSG_STATSMENU          "Stats"
-	#define MSG_STATSMENU_LIFETIME "Lifetime"
-	#define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
         #define MSG_STATSMENU_LAST     "Last print"
-	#define MSG_STATSMENU_RESET    "Reset triptime"
-	#define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
         #define MSG_STATS_PRINTTIME    "Printing:"
         #define MSG_STATS_FILAMENT     "Filament:"
 #endif
@@ -519,6 +519,14 @@
 	#define MSG_BABYSTEPPING_Y "Babystepping w osi Y"
 	#define MSG_BABYSTEPPING_Z "Babystepping w osi Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
+
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
 
 #endif
 
@@ -736,6 +744,14 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 #endif
 
 
@@ -744,7 +760,7 @@
 // LCD Menu Messages
 // Please note these are limited to 17 characters!
 
-	#define WELCOME_MSG MACHINE_NAME
+	#define WELCOME_MSG MACHINE_NAME " Bereit."
 
 	#define MSG_SD_INSERTED      "SDKarte erkannt"
 	#define MSG_SD_REMOVED       "SDKarte entfernt"
@@ -945,7 +961,7 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
-	#define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU          "Stats"
         #define MSG_STATSMENU_LIFETIME "Lifetime"
         #define MSG_STATSMENU_TRIPTIME "Triptime"
         #define MSG_STATSMENU_LAST     "Last print"
@@ -1175,6 +1191,14 @@
 	#define MSG_BABYSTEPPING_Y "Babystepping Y"
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
+
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
 
 #endif
 
@@ -1414,19 +1438,19 @@
 	#define MSG_AUTO_HOME            "Auto Home"
 	#define MSG_SET_ORIGIN           "Imposta Origine"
 	#define MSG_PREHEAT_PLA          "Preriscalda    "
-	#define MSG_PREHEAT_PLA0         "Preriscalda DX "
+	#define MSG_PREHEAT_PLA0         "Preriscalda    "
         #define MSG_PREHEAT_PLA1         "Preriscalda SX "
         #define MSG_PREHEAT_PLA2         "Preriscalda PLA 3"
         #define MSG_PREHEAT_PLA012       "Preris. Tutto  "
         #define MSG_PREHEAT_PLA_BEDONLY  "Preri. Piatto  "
 	#define MSG_PREHEAT_PLA_SETTINGS "Preris. DX Conf"
 	#define MSG_PREHEAT_ABS          "Preriscalda SX"
-	#define MSG_PREHEAT_ABS0         "Preriscalda ABS 1"
-        #define MSG_PREHEAT_ABS1         "Preriscalda ABS 2"
-        #define MSG_PREHEAT_ABS2         "Preriscalda ABS 3"
-        #define MSG_PREHEAT_ABS012       "Preris. ABS Tutto"
-        #define MSG_PREHEAT_ABS_BEDONLY  "Preri. ABS Piatto"
-	#define MSG_PREHEAT_ABS_SETTINGS "Preris. SX Conf"
+	//#define MSG_PREHEAT_ABS0         "Preriscalda ABS 1"
+        //#define MSG_PREHEAT_ABS1         "Preriscalda ABS 2"
+        //#define MSG_PREHEAT_ABS2         "Preriscalda ABS 3"
+        //#define MSG_PREHEAT_ABS012       "Preris. ABS Tutto"
+        //#define MSG_PREHEAT_ABS_BEDONLY  "Preri. ABS Piatto"
+	//#define MSG_PREHEAT_ABS_SETTINGS "Preris. SX Conf"
 	#define MSG_COOLDOWN             "Raffredda"
 	#define MSG_SWITCH_PS_ON 	 "Alimentarore On "
         #define MSG_SWITCH_PS_OFF 	 "ALimentatore Off"
@@ -1442,7 +1466,7 @@
         #define MSG_MOVE_01MM            "Move 0.1mm"
         #define MSG_MOVE_1MM             "Move 1mm"
         #define MSG_MOVE_10MM            "Move 10mm"
-	#define MSG_PLATE_LEVEL_A 	 "Test Piano"
+	//#define MSG_PLATE_LEVEL_A 	 "Test Piano"
         #define MSG_PLATE_LEVEL_M        "Calib. Piano Man."
         #define MSG_MOVEDOWN             "Abbassa piano    "
         #define MSG_DUAL_CALIBRATION     "Calibraz. Dual   "
@@ -1461,7 +1485,7 @@
 	#define MSG_BED                  "Piatto"
 	#define MSG_FAN_SPEED            "Ventola"
 	#define MSG_FLOW                 "Flusso"
-	#define MSG_FLOW0                "Flusso 0"
+	//#define MSG_FLOW0                "Flusso 0"
 	#define MSG_FLOW1                "Flusso 1"
 	#define MSG_FLOW2                "Flusso 2"
 	#define MSG_CONTROL              "Settaggi"
@@ -1615,7 +1639,7 @@
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Qualcosa non va in MenuStructure."
 
         #define MSG_STATSMENU          "Statistiche"
-	#define MSG_STATSMENU_LIFETIME "Totali"
+        #define MSG_STATSMENU_LIFETIME "Totali"
         #define MSG_STATSMENU_TRIPTIME "Parziali"
         #define MSG_STATSMENU_LAST     "Ultima stampa"
         #define MSG_STATSMENU_RESET    "Reset parziali"
@@ -1834,6 +1858,14 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Algo esta errado na estrutura do Menu."
 
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 #endif
 
 
@@ -2034,6 +2066,15 @@
 	#define MSG_ENDSTOP_ABORT "Endstop abort"
 	#define MSG_CONTRAST "Kontrasti"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Virhe valikon rakenteessa"
+
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 
 #endif
 
@@ -2240,6 +2281,14 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error in menu structure"
 
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 #endif
 
 #if LANGUAGE_CHOICE == 11 //Dutch
@@ -2436,6 +2485,14 @@
 	#define MSG_BABYSTEPPING_Y "Babystepping Y"
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Fout in menustructuur"
+
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
 
 #endif
 
@@ -2636,6 +2693,14 @@
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Error a l'estructura dels menus"
 
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
+
 #endif
 
 //Basque-Euskera
@@ -2833,6 +2898,14 @@
 	#define MSG_BABYSTEPPING_Y "Babystepping Y"
 	#define MSG_BABYSTEPPING_Z "Babystepping Z"
 	#define MSG_SERIAL_ERROR_MENU_STRUCTURE "Akatsak menu-an"
+
+        #define MSG_STATSMENU          "Stats"
+        #define MSG_STATSMENU_LIFETIME "Lifetime"
+        #define MSG_STATSMENU_TRIPTIME "Triptime"
+        #define MSG_STATSMENU_RESET    "Reset triptime"
+        #define MSG_STATS_LIFETIME     "Power On:"
+        #define MSG_STATS_PRINTTIME    "Printing:"
+        #define MSG_STATS_FILAMENT     "Filament:"
 	
 #endif
 

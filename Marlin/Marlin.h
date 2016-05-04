@@ -255,7 +255,7 @@ extern void digipot_i2c_init();
 #endif
 
 #ifdef USE_FILAMENT_DETECTION
-extern bool detect_filament;
+extern volatile bool detect_filament;
 #endif
 
 #endif

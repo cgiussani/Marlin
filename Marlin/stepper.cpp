@@ -88,6 +88,13 @@ static bool check_endstops = true;
 volatile long count_position[NUM_AXIS] = { 0, 0, 0, 0};
 volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1};
 
+#ifdef USE_FILAMENT_DETECTION
+volatile static float fd_count = 0;
+extern volatile bool forced_M600;
+extern volatile bool detect_filament;
+extern volatile float detect_filament_factor;
+#endif
+
 //===========================================================================
 //=============================functions         ============================
 //===========================================================================
@@ -460,6 +467,9 @@ ISR(TIMER1_COMPA_vect)
       {
         #if defined(Y_MIN_PIN) && Y_MIN_PIN > -1
           bool y_min_endstop=(READ(Y_MIN_PIN) != Y_MIN_ENDSTOP_INVERTING);
+          #if defined(Y2_MIN_PIN) && Y2_MIN_PIN > -1
+          y_min_endstop|=(READ(Y2_MIN_PIN) != Y_MIN_ENDSTOP_INVERTING);
+          #endif
           if(y_min_endstop && old_y_min_endstop && (current_block->steps_y > 0)) {
             endstops_trigsteps[Y_AXIS] = count_position[Y_AXIS];
             endstop_y_hit=true;
@@ -474,6 +484,9 @@ ISR(TIMER1_COMPA_vect)
       {
         #if defined(Y_MAX_PIN) && Y_MAX_PIN > -1
           bool y_max_endstop=(READ(Y_MAX_PIN) != Y_MAX_ENDSTOP_INVERTING);
+		  #if defined(Y2_MAX_PIN) && Y2_MAX_PIN > -1
+          y_max_endstop|=(READ(Y2_MAX_PIN) != Y_MAX_ENDSTOP_INVERTING);
+          #endif
           if(y_max_endstop && old_y_max_endstop && (current_block->steps_y > 0)){
             endstops_trigsteps[Y_AXIS] = count_position[Y_AXIS];
             endstop_y_hit=true;
@@ -521,7 +534,7 @@ ISR(TIMER1_COMPA_vect)
         #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
           bool z_max_endstop=(READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING);
           #if defined(Z2_MAX_PIN) && Z2_MAX_PIN > -1
-          z_max_endstop= z_max_endstop || (READ(Z2_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING);
+          z_max_endstop = z_max_endstop || (READ(Z2_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING);
           #endif
           if(z_max_endstop && old_z_max_endstop && (current_block->steps_z > 0)) {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
@@ -707,6 +720,22 @@ ISR(TIMER1_COMPA_vect)
 
     // If current block is finished, reset pointer
     if (step_events_completed >= current_block->step_event_count) {
+
+#ifdef USE_FILAMENT_DETECTION
+      if (detect_filament && (forced_M600 == false)){
+
+        if (READ(FIL_DETECT_PIN) == 0){
+          fd_count+=count_direction[E_AXIS]*current_block->steps_e;
+          if (fd_count > (FILAMENT_DETECTION_COUNT * detect_filament_factor) && forced_M600 == false){
+            forced_M600 = true;
+            fd_count = 0;
+          }
+        } else {
+          fd_count = 0;
+        }
+
+      }
+#endif
       current_block = NULL;
       plan_discard_current_block();
     }

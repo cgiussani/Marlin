@@ -270,11 +270,10 @@ static void lcd_sdcard_stop()
     lcd_cooldown();
     clear_command_queue();
 
-    enquecommand_P((PSTR("G0 Z200 F1000")));
+    //enquecommand_P((PSTR("G0 Z200 F1000"))); // fabio cambio stop
+    enquecommand_P((PSTR("G28 Z")));
     enquecommand_P((PSTR("G28 X Y"))); // move all axis home
-    // Only 3 commands can be buffered
-    //enquecommand_P((PSTR("M106 S0")));
-    fanSpeed = 0;
+    enquecommand_P((PSTR("M106 S0")));
 
     if(SD_FINISHED_STEPPERRELEASE)
     {
@@ -287,80 +286,63 @@ static void lcd_sdcard_stop()
 
 static void print_lifetime_row( unsigned long int i, int row )
 {
-    lcd.setCursor(0, 1+row);
-    if ( row == 0 )
-        lcd_printPGM(PSTR(MSG_STATS_LIFETIME));
-    else
-        lcd_printPGM(PSTR(MSG_STATS_PRINTTIME));
-    lcd.setCursor(10, 1+row);
-    lcd.print( itostr4(i/1440) );
-    i = i%1440;
-    lcd_printPGM(PSTR(":" ));
-    lcd.print( itostr2(i/60) );
-    i = i%60;
-    lcd_printPGM(PSTR(":" ));
-    lcd.print( itostr2(i) );
+  lcd.setCursor(0, 1+row);
+  if ( row == 0 )
+      lcd_printPGM(PSTR(MSG_STATS_LIFETIME));
+  else
+      lcd_printPGM(PSTR(MSG_STATS_PRINTTIME));
+  lcd.setCursor(10, 1+row);
+  lcd.print( itostr4(i/1440) );
+  i = i%1440;
+  lcd_printPGM(PSTR(":" ));
+  lcd.print( itostr2(i/60) );
+  i = i%60;
+  lcd_printPGM(PSTR(":" ));
+  lcd.print( itostr2(i) );
 }
 
 static void lcd_lifetime_stats()
 {
-    unsigned long int i;
-    START_MENU();
-    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
-    print_lifetime_row( lifetime_minutes, 0 );
-    print_lifetime_row( lifetime_print_minutes, 1 );
+  unsigned long int i;
+  START_MENU();
+  MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
+  print_lifetime_row( lifetime_minutes, 0 );
+  print_lifetime_row( lifetime_print_minutes, 1 );
 
-    i = lifetime_print_centimeters;
-    lcd.setCursor(0, 3);
-    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
-    lcd.setCursor(12, 3);
-    lcd.print( ftostr5((float)i/100.0) );
-    lcd_printPGM(PSTR(" m"));
-    END_MENU();
+  i = lifetime_print_centimeters;
+  lcd.setCursor(0, 3);
+  lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
+  lcd.setCursor(12, 3);
+  lcd.print( ftostr5((float)i/100.0) );
+  lcd_printPGM(PSTR(" m"));
+  END_MENU();
 }
 
 static void lcd_triptime_stats()
 {
-    unsigned long int i;
-    START_MENU();
-    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
-    print_lifetime_row( triptime_minutes, 0 );
-    print_lifetime_row( triptime_print_minutes, 1 );
+  unsigned long int i;
+  START_MENU();
+  MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
+  print_lifetime_row( triptime_minutes, 0 );
+  print_lifetime_row( triptime_print_minutes, 1 );
 
-    i = triptime_print_centimeters;
-    lcd.setCursor(0, 3);
-    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
-    lcd.setCursor(12, 3);
-    lcd.print( ftostr5((float)i/100.0) );
-    lcd_printPGM(PSTR(" m"));
-    END_MENU();
-}
-
-static void lcd_lastprint_stats()
-{
-    unsigned long int i;
-    START_MENU();
-    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
-    print_lifetime_row( last_print_minutes, 1 );
-
-    i = last_print_centimeters;
-    lcd.setCursor(0, 3);
-    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
-    lcd.setCursor(12, 3);
-    lcd.print( ftostr5((float)i/100.0) );
-    lcd_printPGM(PSTR(" m"));
-    END_MENU();
+  i = triptime_print_centimeters;
+  lcd.setCursor(0, 3);
+  lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
+  lcd.setCursor(12, 3);
+  lcd.print( ftostr5((float)i/100.0) );
+  lcd_printPGM(PSTR(" m"));
+  END_MENU();
 }
 
 static void lcd_stats_menu()
 {
-    START_MENU();
-    MENU_ITEM(back, MSG_WATCH, lcd_main_menu);
-    MENU_ITEM(submenu, MSG_STATSMENU_LIFETIME, lcd_lifetime_stats);
-    MENU_ITEM(submenu, MSG_STATSMENU_TRIPTIME, lcd_triptime_stats);
-    MENU_ITEM(submenu, MSG_STATSMENU_LAST, lcd_lastprint_stats);
-    MENU_ITEM(function, MSG_STATSMENU_RESET, reset_triptime );
-    END_MENU();
+  START_MENU();
+  MENU_ITEM(back, MSG_WATCH, lcd_main_menu);
+  MENU_ITEM(submenu, MSG_STATSMENU_LIFETIME, lcd_lifetime_stats);
+  MENU_ITEM(submenu, MSG_STATSMENU_TRIPTIME, lcd_triptime_stats);
+  MENU_ITEM(function, MSG_STATSMENU_RESET, reset_triptime );
+  END_MENU();
 }
 
 /* Menu implementation */
@@ -522,7 +504,7 @@ static void lcd_tune_menu()
 #endif
     MENU_ITEM_EDIT(int3, MSG_FAN_SPEED, &fanSpeed, 0, 255);
     MENU_ITEM_EDIT(int3, MSG_FLOW, &extrudemultiply, 10, 999);
-    MENU_ITEM_EDIT(int3, MSG_FLOW0, &extruder_multiply[0], 10, 999);
+  //  MENU_ITEM_EDIT(int3, MSG_FLOW0, &extruder_multiply[0], 10, 999);
 #if TEMP_SENSOR_1 != 0
     MENU_ITEM_EDIT(int3, MSG_FLOW1, &extruder_multiply[1], 10, 999);
 #endif
@@ -538,10 +520,10 @@ static void lcd_tune_menu()
     MENU_ITEM(submenu, MSG_BABYSTEP_Z, lcd_babystep_z);
 #endif
 #ifdef FILAMENTCHANGEENABLE
-    MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600 X220 Y200"));
+    MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600 X10 Y210")); // Fabio
 #endif
 #ifdef USE_FILAMENT_DETECTION
-    MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
+    //MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
 #endif
     END_MENU();
 }
@@ -668,18 +650,18 @@ static void lcd_preheat_abs_menu()
 {
     START_MENU();
     MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
-    MENU_ITEM(function, MSG_PREHEAT_ABS0, lcd_preheat_abs0);
+    //MENU_ITEM(function, MSG_PREHEAT_ABS0, lcd_preheat_abs0);
 #if TEMP_SENSOR_1 != 0 //2 extruder preheat
-    MENU_ITEM(function, MSG_PREHEAT_ABS1, lcd_preheat_abs1);
+    //MENU_ITEM(function, MSG_PREHEAT_ABS1, lcd_preheat_abs1);
 #endif //2 extruder preheat
 #if TEMP_SENSOR_2 != 0 //3 extruder preheat
-    MENU_ITEM(function, MSG_PREHEAT_ABS2, lcd_preheat_abs2);
+    //MENU_ITEM(function, MSG_PREHEAT_ABS2, lcd_preheat_abs2);
 #endif //3 extruder preheat
 #if TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 //all extruder preheat
-    MENU_ITEM(function, MSG_PREHEAT_ABS012, lcd_preheat_abs012);
+    //MENU_ITEM(function, MSG_PREHEAT_ABS012, lcd_preheat_abs012);
 #endif //2 extruder preheat
 #if TEMP_SENSOR_BED != 0
-    MENU_ITEM(function, MSG_PREHEAT_ABS_BEDONLY, lcd_preheat_abs_bedonly);
+    //MENU_ITEM(function, MSG_PREHEAT_ABS_BEDONLY, lcd_preheat_abs_bedonly);
 #endif
     END_MENU();
 }
@@ -715,7 +697,7 @@ static void lcd_prepare_menu()
     }
 #endif
     MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
-    MENU_ITEM(function, MSG_PLATE_LEVEL_A, lcd_ut_level_plate_a);
+  //  MENU_ITEM(function, MSG_PLATE_LEVEL_A, lcd_ut_level_plate_a);
 #ifndef CFG_MATERIA101
     MENU_ITEM(function, MSG_PLATE_LEVEL_M, lcd_ut_level_plate_m);
     MENU_ITEM(function, MSG_MOVEDOWN, lcd_ut_movedown);
@@ -738,7 +720,7 @@ static void lcd_prepare_menu()
 #endif
 
 #ifdef USE_FILAMENT_DETECTION
-    MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
+    //MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
 #endif
 
     END_MENU();
@@ -989,7 +971,7 @@ static void lcd_control_temperature_menu()
 # endif//PID_ADD_EXTRUSION_RATE
 #endif//PIDTEMP
     MENU_ITEM(submenu, MSG_PREHEAT_PLA_SETTINGS, lcd_control_temperature_preheat_pla_settings_menu);
-    MENU_ITEM(submenu, MSG_PREHEAT_ABS_SETTINGS, lcd_control_temperature_preheat_abs_settings_menu);
+    //MENU_ITEM(submenu, MSG_PREHEAT_ABS_SETTINGS, lcd_control_temperature_preheat_abs_settings_menu);
     END_MENU();
 }
 
@@ -1147,7 +1129,7 @@ void lcd_sdprint_settings()
     MENU_ITEM(submenu, MSG_PRINT_GCODE, lcd_sdprint_none );
     MENU_ITEM(submenu, "PLA", lcd_sdprint_pla );
 #ifndef CFG_MATERIA101
-    MENU_ITEM(submenu, "ABS", lcd_sdprint_abs );
+    //MENU_ITEM(submenu, "ABS", lcd_sdprint_abs );
 #endif
     END_MENU();
 }

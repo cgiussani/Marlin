@@ -163,11 +163,12 @@
 #ifdef Z_DUAL_STEPPER_DRIVERS
   #undef EXTRUDERS
   #define EXTRUDERS 1
-  #define Z2_MAX_PIN 32
+  #define Z2_MAX_PIN 36
+  #define Z2_MIN_PIN 33 
 #endif
 
 // Same again but for Y Axis.
-//#define Y_DUAL_STEPPER_DRIVERS
+#define Y_DUAL_STEPPER_DRIVERS
 
 // Define if the two Y drives need to rotate in opposite directions
 #define INVERT_Y2_VS_Y_DIR true
@@ -177,9 +178,9 @@
   #define EXTRUDERS 1
 #endif
 
-#if defined (Z_DUAL_STEPPER_DRIVERS) && defined (Y_DUAL_STEPPER_DRIVERS)
-  #error "You cannot have dual drivers for both Y and Z"
-#endif
+//#if defined (Z_DUAL_STEPPER_DRIVERS) && defined (Y_DUAL_STEPPER_DRIVERS)
+//  #error "You cannot have dual drivers for both Y and Z"
+//#endif
 
 // Enable this for dual x-carriage printers. 
 // A dual x-carriage design has the advantage that the inactive extruder can be parked which
@@ -245,7 +246,7 @@
 #define INVERT_E_STEP_PIN false
 
 //default stepper release if idle
-#define DEFAULT_STEPPER_DEACTIVE_TIME 1800
+#define DEFAULT_STEPPER_DEACTIVE_TIME 86400
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0
@@ -268,7 +269,7 @@
 // Frequency limit
 // See nophead's blog for more info
 // Not working O
-#define XY_FREQUENCY_LIMIT  10
+#define XY_FREQUENCY_LIMIT  15 //100 sharebot originale
 
 // Minimum planner junction speed. Sets the default minimum speed the planner plans for at the end
 // of the buffer and all stops. This should not be much greater than zero and should only be changed
@@ -438,11 +439,11 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 #ifdef ULTIPANEL
   #define FILAMENTCHANGEENABLE
   #ifdef FILAMENTCHANGEENABLE
-    #define FILAMENTCHANGE_XPOS 100
-    #define FILAMENTCHANGE_YPOS 100
-    #define FILAMENTCHANGE_ZADD 10
-    #define FILAMENTCHANGE_FIRSTRETRACT -0
-    #define FILAMENTCHANGE_FINALRETRACT -200
+    #define FILAMENTCHANGE_XPOS 10
+    #define FILAMENTCHANGE_YPOS 210
+    #define FILAMENTCHANGE_ZADD 50
+    #define FILAMENTCHANGE_FIRSTRETRACT -2
+    #define FILAMENTCHANGE_FINALRETRACT -40
     #define FILAMENTCHANGE_FEEDRATE 600
   #endif
 #endif
@@ -453,6 +454,13 @@ const unsigned int dropsegments=5; //everything with less than this number of st
   #endif 
 #endif
  
+// Pause/Resume
+#define PAUSERESUME_FEEDRATE 600
+#define PAUSERESUME_RETRACT -3
+#define PAUSERESUME_XPOS 20
+#define PAUSERESUME_YPOS 180
+#define PAUSERESUME_ZADD 20
+
 //===========================================================================
 //=============================  Define Defines  ============================
 //===========================================================================

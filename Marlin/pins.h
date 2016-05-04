@@ -582,9 +582,7 @@
   #else
     #define FAN_PIN            4 // IO pin. Buffer needed
     #define FAN_PIN2           5 // IO pin. Buffer needed
-    #ifndef CFG_MATERIA101
-      #define FAN_TO_FAN2          // If enabled FAN_PIN2 acts exactly like FAN_PIN
-    #endif
+    #define FAN_TO_FAN2          // If enabled FAN_PIN2 acts exactly like FAN_PIN
   #endif
 
   #if MOTHERBOARD == 77
@@ -1544,13 +1542,19 @@
 #define X_DIR_PIN          16
 #define X_ENABLE_PIN       48
 #define X_MIN_PIN          37
-#define X_MAX_PIN          36
+#define X_MAX_PIN          36 //Filament detection 31
 
 #define Y_STEP_PIN         54
 #define Y_DIR_PIN          47
 #define Y_ENABLE_PIN       55
-#define Y_MIN_PIN          35
+#define Y_MIN_PIN          -1
 #define Y_MAX_PIN          34
+
+#define Y2_STEP_PIN        26
+#define Y2_DIR_PIN         25
+#define Y2_ENABLE_PIN      27
+#define Y2_MIN_PIN         -1
+#define Y2_MAX_PIN         35
 
 #define Z_STEP_PIN         57
 #define Z_DIR_PIN          56
@@ -1558,17 +1562,21 @@
 #define Z_MIN_PIN          33
 #define Z_MAX_PIN          32
 
+#define Z2_STEP_PIN        29
+#define Z2_DIR_PIN         28
+#define Z2_ENABLE_PIN      39
+    
 #define E0_STEP_PIN        23
 #define E0_DIR_PIN         22
 #define E0_ENABLE_PIN      24
 
-#define E1_STEP_PIN        26
-#define E1_DIR_PIN         25
-#define E1_ENABLE_PIN      27
+#define E1_STEP_PIN        -1//26
+#define E1_DIR_PIN         -1//25
+#define E1_ENABLE_PIN      -1//27
 
-#define E2_STEP_PIN        29
-#define E2_DIR_PIN         28
-#define E2_ENABLE_PIN      39
+#define E2_STEP_PIN        -1//29
+#define E2_DIR_PIN         -1//28
+#define E2_ENABLE_PIN      -1//39
 
 #define LED_PIN            13
 

@@ -11,8 +11,9 @@ extern unsigned long last_print_minutes;
 extern unsigned long last_print_centimeters;
 
 void lifetime_stats_init();
+void lifetime_stats_update_e(float newPos);
 void lifetime_stats_tick();
-void print_lifetime_stats();
+void print_lifetime_stats(int condensed);
 void reset_triptime();
 
 #endif//LIFETIME_STATS_H

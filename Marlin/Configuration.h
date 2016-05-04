@@ -6,21 +6,12 @@
 // BASIC SETTINGS: select your board type, temperature sensor type, axis scaling, and endstop configuration
 
 // Specific configurations
-// 0 - DEFAULT
-// 1 - CFG_MATERIA101
-// 2 - SHAREBOT Q
-#define SPEC_CFG 0
+//#define CFG_MATERIA101
 
-#if SPEC_CFG == 1
+#ifdef CFG_MATERIA101
 #undef CONFIGURATION_H
 #include "cfg_materia101.h"
 #include "cfg_materia101_adv.h"
-
-#elif SPEC_CFG == 2
-#undef CONFIGURATION_H
-#include "cfg_Q.h"
-#include "cfg_Q_adv.h"
-#include "pins_Q.h"
 
 #else
 // Default: Marlin configuration
@@ -106,8 +97,8 @@
 
 // This defines the number of extruders
 #ifndef EXTRUDERS
-//   #define EXTRUDERS 1
-#define EXTRUDERS 2
+#define EXTRUDERS 1
+//#define EXTRUDERS 2
 #endif
 
 //// The following define selects which power supply you have. Please choose the one that matches your setup
@@ -158,7 +149,11 @@
 // 110 is Pt100 with 1k pullup (non standard)
 // 70 is 500C thermistor for Pico hot end
 
+#define USE_EXTERNAL_CLICK
+#define EXT_CLICK_PIN 31
+
 #define USE_FILAMENT_DETECTION
+#define FIL_DETECT_PIN 30
 
 #if EXTRUDERS == 1
 
@@ -198,9 +193,9 @@
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-#define HEATER_0_MAXTEMP 265
-#define HEATER_1_MAXTEMP 265
-#define HEATER_2_MAXTEMP 265
+#define HEATER_0_MAXTEMP 285
+#define HEATER_1_MAXTEMP 285
+#define HEATER_2_MAXTEMP 285
 #define BED_MAXTEMP 115
 
 // If your bed has low resistance e.g. .6 ohm and throws the fuse you can duty cycle it to reduce the
@@ -238,9 +233,9 @@
 //    #define  DEFAULT_Kd 12
 
 // Mendel Parts V9 on 12V
-    #define  DEFAULT_Kp 12.15
-    #define  DEFAULT_Ki 1.0
-    #define  DEFAULT_Kd 37.02
+    #define  DEFAULT_Kp 12.56
+    #define  DEFAULT_Ki 0.57
+    #define  DEFAULT_Kd 68.76
 #endif // PIDTEMP
 
 // Bed Temperature Control
@@ -287,7 +282,7 @@
 //if PREVENT_DANGEROUS_EXTRUDE is on, you can still disable (uncomment) very long bits of extrusion separately.
 #define PREVENT_LENGTHY_EXTRUDE
 
-#define EXTRUDE_MINTEMP 0
+#define EXTRUDE_MINTEMP 170
 #define EXTRUDE_MAXLENGTH (X_MAX_LENGTH+Y_MAX_LENGTH) //prevent extrusion of very large distances.
 
 //===========================================================================
@@ -350,7 +345,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define INVERT_X_DIR true    // for Mendel set to false, for Orca set to true
 #define INVERT_Y_DIR true    // for Mendel set to true, for Orca set to false
 #define INVERT_Z_DIR true     // for Mendel set to false, for Orca set to true
-#define INVERT_E0_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#define INVERT_E0_DIR true   // for direct drive extruder v9 set to true, for geared extruder set to false
 #define INVERT_E1_DIR true    // for direct drive extruder v9 set to true, for geared extruder set to false
 #define INVERT_E2_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
 
@@ -363,18 +358,18 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #if MOTHERBOARD == 34
 #define Z_HOME_DIR 1
 #elif MOTHERBOARD == 80
-#define Z_HOME_DIR -1
+#define Z_HOME_DIR 1
 #endif
 
 #define min_software_endstops true // If true, axis won't move to coordinates less than HOME_POS.
 #define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // Travel limits after homing
-#define X_MAX_POS 205
+#define X_MAX_POS 255
 #define X_MIN_POS 0
-#define Y_MAX_POS 205
+#define Y_MAX_POS 220
 #define Y_MIN_POS 0
-#define Z_MAX_POS 200
+#define Z_MAX_POS 207
 #define Z_MIN_POS 0
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
@@ -382,7 +377,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define Z_MAX_LENGTH (Z_MAX_POS - Z_MIN_POS)
 //============================= Bed Auto Leveling ===========================
 
-//#define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
+#define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
 
 #ifdef ENABLE_AUTO_BED_LEVELING
 
@@ -398,7 +393,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //    Probe 3 arbitrary points on the bed (that aren't colinear)
 //    You must specify the X & Y coordinates of all 3 points
 
-  #define AUTO_BED_LEVELING_GRID
+  //#define AUTO_BED_LEVELING_GRID
   // with AUTO_BED_LEVELING_GRID, the bed is sampled in a
   // AUTO_BED_LEVELING_GRID_POINTSxAUTO_BED_LEVELING_GRID_POINTS grid
   // and least squares solution is calculated
@@ -406,10 +401,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
   #ifdef AUTO_BED_LEVELING_GRID
 
     // set the rectangle in which to probe
-    #define LEFT_PROBE_BED_POSITION 15
-    #define RIGHT_PROBE_BED_POSITION 170
-    #define BACK_PROBE_BED_POSITION 180
-    #define FRONT_PROBE_BED_POSITION 20
+    #define LEFT_PROBE_BED_POSITION 50
+    #define RIGHT_PROBE_BED_POSITION 250
+    #define BACK_PROBE_BED_POSITION 350
+    #define FRONT_PROBE_BED_POSITION 50
 
      // set the number of grid points per dimension
      // I wouldn't see a reason to go above 3 (=9 probing points on the bed)
@@ -420,25 +415,25 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
     // with no grid, just probe 3 arbitrary points.  A simple cross-product
     // is used to esimate the plane of the print bed
 
-      #define ABL_PROBE_PT_1_X 15
-      #define ABL_PROBE_PT_1_Y 180
-      #define ABL_PROBE_PT_2_X 15
+      #define ABL_PROBE_PT_1_X 220
+      #define ABL_PROBE_PT_1_Y 225
+      #define ABL_PROBE_PT_2_X 125
       #define ABL_PROBE_PT_2_Y 20
-      #define ABL_PROBE_PT_3_X 170
-      #define ABL_PROBE_PT_3_Y 20
+      #define ABL_PROBE_PT_3_X 10
+      #define ABL_PROBE_PT_3_Y 225
 
   #endif // AUTO_BED_LEVELING_GRID
 
 
   // these are the offsets to the probe relative to the extruder tip (Hotend - Probe)
-  #define X_PROBE_OFFSET_FROM_EXTRUDER -25
-  #define Y_PROBE_OFFSET_FROM_EXTRUDER -29
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER -12.35
+  #define X_PROBE_OFFSET_FROM_EXTRUDER -35.3
+  #define Y_PROBE_OFFSET_FROM_EXTRUDER 0
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER -1   
 
-  #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
+  #define Z_RAISE_BEFORE_HOMING 5       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
 
-  #define XY_TRAVEL_SPEED 8000         // X and Y axis travel speed between probes, in mm/min
+  #define XY_TRAVEL_SPEED 10000         // X  and Y axis travel speed between probes, in mm/min
 
   #define Z_RAISE_BEFORE_PROBING 15    //How much the extruder will be raised before traveling to the first probing point.
   #define Z_RAISE_BETWEEN_PROBINGS 5  //How much the extruder will be raised when traveling from between next probing points
@@ -454,7 +449,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //If you have enabled the Bed Auto Leveling and are using the same Z Probe for Z Homing,
 //it is highly recommended you let this Z_SAFE_HOMING enabled!!!
 
-  #define Z_SAFE_HOMING   // This feature is meant to avoid Z homing with probe outside the bed area.
+  //#define Z_SAFE_HOMING   // This feature is meant to avoid Z homing with probe outside the bed area.
                           // When defined, it will:
                           // - Allow Z homing only after X and Y homing AND stepper drivers still enabled
                           // - If stepper drivers timeout, it will need X and Y homing again before Z homing
@@ -474,15 +469,15 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 // Travel limits after homing
 #if EXTRUDERS == 1
 
- #define X_MAX_POS 260
+ #define X_MAX_POS 255
  #define X_MIN_POS 0
- #define Y_MAX_POS 200
+ #define Y_MAX_POS 220
  #define Y_MIN_POS 0
- #define Z_MAX_POS 210
+ #define Z_MAX_POS 207
  #define Z_MIN_POS 0
 
  #if MOTHERBOARD == 80
-    #define Z_MAX_POS 206
+    #define Z_MAX_POS 207
  #endif
 
  #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
@@ -495,11 +490,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 //Manual homing switch locations:
 // For deltabots this means top and center of the cartesian print volume.
- #define MANUAL_X_HOME_POS 260
- #define MANUAL_Y_HOME_POS 200
- #define MANUAL_Z_HOME_POS 210
+ #define MANUAL_X_HOME_POS 255
+ #define MANUAL_Y_HOME_POS 220
+ #define MANUAL_Z_HOME_POS 207
  #if MOTHERBOARD == 80
-   #define MANUAL_Z_HOME_POS 206
+   #define MANUAL_Z_HOME_POS 207
  #endif
 
 //#define MANUAL_Z_HOME_POS 402 // For delta: Distance between nozzle and print surface after homing.
@@ -508,15 +503,15 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 #if EXTRUDERS == 2
  
- #define X_MAX_POS 230
+ #define X_MAX_POS 255
  #define X_MIN_POS 0
- #define Y_MAX_POS 200
+ #define Y_MAX_POS 220
  #define Y_MIN_POS 0
- #define Z_MAX_POS 210
- #define Z_MIN_POS 0
+ #define Z_MAX_POS 207
+ #define Z_MIN_POS 0  
 
  #if MOTHERBOARD == 80
-   #define MANUAL_Z_HOME_POS 206
+   #define MANUAL_Z_HOME_POS 207
  #endif
 
  #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
@@ -529,11 +524,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 //Manual homing switch locations:
 // For deltabots this means top and center of the cartesian print volume.
- #define MANUAL_X_HOME_POS 230
- #define MANUAL_Y_HOME_POS 200
- #define MANUAL_Z_HOME_POS 210
+ #define MANUAL_X_HOME_POS 255
+ #define MANUAL_Y_HOME_POS 220
+ #define MANUAL_Z_HOME_POS 207
  #if MOTHERBOARD == 80
-   #define MANUAL_Z_HOME_POS 206
+   #define MANUAL_Z_HOME_POS 207
  #endif
 
 //#define MANUAL_Z_HOME_POS 402 // For delta: Distance between nozzle and print surface after homing.
@@ -542,21 +537,21 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
-#define HOMING_FEEDRATE {50*60, 50*60, 1000, 0}  // set the homing speeds (mm/min)
+#define HOMING_FEEDRATE {50*60, 50*60, 500, 0}  // set the homing speeds (mm/min)Z PRIMA500
 
 // default settings
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,400,96.2753}  // default steps per unit for ultimaker
-#define DEFAULT_MAX_FEEDRATE          {300, 300, 19, 35}    // (mm/sec)
-#define DEFAULT_MAX_ACCELERATION      {2000,2000,100,2000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,1600,96.2753}  // default steps per unit for ultimaker Z PRIMA 1600 (400 vite NG)
+#define DEFAULT_MAX_FEEDRATE          {300, 300, 10, 35}    // (mm/sec)
+#define DEFAULT_MAX_ACCELERATION      {7000,7000,16,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
-#define DEFAULT_ACCELERATION          800    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  800   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+#define DEFAULT_ACCELERATION          4000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  4000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
 // For the other hotends it is their distance from the extruder 0 hotend.
-#define EXTRUDER_OFFSET_X {0.0,-58.50} // (in mm) for each extruder, offset of the hotend on the X axis
+#define EXTRUDER_OFFSET_X {0.0,-35.50} // (in mm) for each extruder, offset of the hotend on the X axis
 #define EXTRUDER_OFFSET_Y {0.0, 0.00}  // (in mm) for each extruder, offset of the hotend on the Y axis
 
 // The speed change that does not require acceleration (i.e. the software might assume it can be done instanteneously)
@@ -572,10 +567,16 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define CUSTOM_M_CODES
 #ifdef CUSTOM_M_CODES
   #define CUSTOM_M_CODE_SET_Z_PROBE_OFFSET 851
-  #define Z_PROBE_OFFSET_RANGE_MIN -15
-  #define Z_PROBE_OFFSET_RANGE_MAX -5
+  #define Z_PROBE_OFFSET_RANGE_MIN -5 // -8  
+  #define Z_PROBE_OFFSET_RANGE_MAX 20 // 2 MAXPROBE
 #endif
 
+//Filament detection parameters
+#ifdef USE_FILAMENT_DETECTION
+  #define FILAMENT_DETECTION_COUNT 988
+  #define FILAMENT_DETECTION_FACTOR_MIN 0.25
+  #define FILAMENT_DETECTION_FACTOR_MAX 4
+#endif
 
 // EEPROM
 // The microcontroller can store settings in the EEPROM, e.g. max velocity...
@@ -592,11 +593,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 // Preheat Constants
 #define PLA_PREHEAT_HOTEND_TEMP 230 
-#define PLA_PREHEAT_HPB_TEMP 90
+#define PLA_PREHEAT_HPB_TEMP 80
 #define PLA_PREHEAT_FAN_SPEED 255   // Insert Value between 0 and 255
 
-#define ABS_PREHEAT_HOTEND_TEMP 230
-#define ABS_PREHEAT_HPB_TEMP 90
+#define ABS_PREHEAT_HOTEND_TEMP 240
+#define ABS_PREHEAT_HPB_TEMP 80
 #define ABS_PREHEAT_FAN_SPEED 255   // Insert Value between 0 and 255
 
 //LCD and SD support
