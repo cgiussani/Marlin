@@ -160,13 +160,13 @@ void CardReader::initsd()
   }
   else if (!volume.init(&card))
   {
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
+    SERIAL_ECHO_START;
+    SERIAL_ECHOLNPGM(MSG_SD_VOL_INIT_FAIL);
   }
   else if (!root.openRoot(&volume)) 
   {
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
+    SERIAL_ECHO_START;
+    SERIAL_ECHOLNPGM(MSG_SD_OPENROOT_FAIL);
   }
   else 
   {
@@ -252,9 +252,9 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
     {
      if((int)file_subcall_ctr>(int)SD_PROCEDURE_DEPTH-1)
      {
-       SERIAL_ERROR_START;
-       SERIAL_ERRORPGM("trying to call sub-gcode files with too many levels. MAX level is:");
-       SERIAL_ERRORLN(SD_PROCEDURE_DEPTH);
+       SERIAL_ECHO_START;
+       SERIAL_ECHOPGM("trying to call sub-gcode files with too many levels. MAX level is:");
+       SERIAL_ECHOLN(SD_PROCEDURE_DEPTH);
        kill();
        return;
      }
@@ -480,8 +480,8 @@ void CardReader::write_command(char *buf)
   file.write(begin);
   if (file.writeError)
   {
-    SERIAL_ERROR_START;
-    SERIAL_ERRORLNPGM(MSG_SD_ERR_WRITE_TO_FILE);
+    SERIAL_ECHO_START;
+    SERIAL_ECHOLNPGM(MSG_SD_ERR_WRITE_TO_FILE);
   }
 }
 

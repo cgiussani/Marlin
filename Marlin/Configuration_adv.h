@@ -182,6 +182,10 @@
 //  #error "You cannot have dual drivers for both Y and Z"
 //#endif
 
+#if defined (Z_DUAL_STEPPER_DRIVERS) || defined (Y_DUAL_STEPPER_DRIVERS)
+  #define AUTOHOME_DUAL_TIMEOUT 10000
+#endif
+
 // Enable this for dual x-carriage printers. 
 // A dual x-carriage design has the advantage that the inactive extruder can be parked which
 // prevents hot-end ooze contaminating the print. It also reduces the weight of each x-carriage

@@ -806,8 +806,21 @@ void get_command()
               SERIAL_PROTOCOLLNPGM(MSG_OK);
             }
             else {
+              SERIAL_ERROR_START;
               SERIAL_ERRORLNPGM(MSG_ERR_STOPPED);
               LCD_MESSAGEPGM(MSG_STOPPED);
+              serial_count = 0;
+              return;
+            }
+            break;
+          case 28:
+          case 29:
+            if(Stopped == true) { // If printer is stopped by an error the G[28|29] codes are ignored.
+                SERIAL_ERROR_START;
+                SERIAL_ERRORLNPGM(MSG_ERR_STOPPED);
+                LCD_MESSAGEPGM(MSG_STOPPED);
+                serial_count = 0;
+                return;
             }
             break;
           default:
@@ -1126,10 +1139,12 @@ static void set_bed_level_equation_3pts(float z_at_pt_1, float z_at_pt_2, float 
     vector_3 pt2 = vector_3(ABL_PROBE_PT_2_X, ABL_PROBE_PT_2_Y, z_at_pt_2);
     vector_3 pt3 = vector_3(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, z_at_pt_3);
 
-    vector_3 from_2_to_1 = (pt1 - pt2).get_normal();
-    vector_3 from_2_to_3 = (pt3 - pt2).get_normal();
-    vector_3 planeNormal = vector_3::cross(from_2_to_1, from_2_to_3).get_normal();
-    planeNormal = vector_3(planeNormal.x, planeNormal.y, abs(planeNormal.z));
+    vector_3 planeNormal = vector_3::cross(pt1 - pt2, pt3 - pt2).get_normal();
+    if (planeNormal.z < 0) {
+        planeNormal.x = -planeNormal.x;
+        planeNormal.y = -planeNormal.y;
+        planeNormal.z = -planeNormal.z;
+    }
 
     plan_bed_level_matrix = matrix_3x3::create_look_at(planeNormal);
 
@@ -1285,7 +1300,9 @@ static void homeaxis(int axis) {
     if (axis == X_AXIS)
       axis_home_dir = x_home_dir(active_extruder);
 #endif
-
+#if defined (Z_DUAL_STEPPER_DRIVERS) || defined (Y_DUAL_STEPPER_DRIVERS)
+    unsigned long int dual_first_millis;
+#endif
     current_position[axis] = 0;
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 
@@ -1356,9 +1373,13 @@ static void homeaxis(int axis) {
          #define HOME_Z_COND (READ(Z_MIN_PIN))
          #define HOME_Z2_COND (READ(Z2_MIN_PIN))
        #endif
-       while ( HOME_Z_DUAL_COND ) {
+       dual_first_millis = millis();
+       while ( HOME_Z_DUAL_COND && (millis() - dual_first_millis < AUTOHOME_DUAL_TIMEOUT) ) {
           int i;
  
+          if ( HOME_Z_COND == HOME_Z2_COND ){
+              dual_first_millis = millis();
+          }
           manage_heater();
           manage_inactivity();
           lcd_update();
@@ -1383,6 +1404,15 @@ static void homeaxis(int axis) {
             }
           }
        }
+       if ( HOME_Z_COND != HOME_Z2_COND ){
+           SERIAL_ECHO_START;
+           SERIAL_ECHOPGM("G28 timeout. Endstops Z = ");
+           SERIAL_ECHO((HOME_Z_COND==0)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN);
+           SERIAL_ECHOPGM(" - ");
+           SERIAL_ECHOLN((HOME_Z2_COND==0)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN);
+           Stopped = true;
+           LCD_ALERTMESSAGEPGM ("Homing Error Z");
+       }
      }
 #endif
 #if defined(Y_DUAL_STEPPER_DRIVERS) && defined(Y2_STEP_PIN) && (Y2_STEP_PIN > -1)
@@ -1398,9 +1428,13 @@ static void homeaxis(int axis) {
          #define HOME_Y_COND (READ(Y_MIN_PIN))
          #define HOME_Y2_COND (READ(Y2_MIN_PIN))
        #endif
-       while ( HOME_Y_DUAL_COND ) {
+       dual_first_millis = millis();
+       while ( HOME_Y_DUAL_COND && (millis() - dual_first_millis < AUTOHOME_DUAL_TIMEOUT) ) {
           int i;
  
+          if ( HOME_Y_COND == HOME_Y2_COND ){
+              dual_first_millis = millis();
+          }
           manage_heater();
           manage_inactivity();
           lcd_update();
@@ -1424,6 +1458,15 @@ static void homeaxis(int axis) {
               WRITE(Y2_STEP_PIN, INVERT_Y_STEP_PIN);
             }
           }
+       }
+       if ( HOME_Y_COND != HOME_Y2_COND ){
+           SERIAL_ECHO_START;
+           SERIAL_ECHOPGM("G28 timeout. Endstops Y = ");
+           SERIAL_ECHO((HOME_Y_COND==0)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN);
+           SERIAL_ECHOPGM(" - ");
+           SERIAL_ECHOLN((HOME_Y2_COND==0)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN);
+           Stopped = true;
+           LCD_ALERTMESSAGEPGM ("Homing Error Y");
        }
      }
 #endif
@@ -1550,6 +1593,9 @@ void process_commands()
 #endif //ENABLE_AUTO_BED_LEVELING
 
       st_synchronize();
+      if(Stopped == true) { // No movement if printer stopped
+          return;
+      }
 
       saved_feedrate = feedrate;
       saved_feedmultiply = feedmultiply;
@@ -1763,7 +1809,7 @@ void process_commands()
 
 #ifdef ENABLE_AUTO_BED_LEVELING
     case 29: // G29 Detailed Z-Probe, probes the bed at 3 or more points.
-        {
+      if(Stopped == false) { // No movement if printer stopped
             #if Z_MIN_PIN == -1
             #error "You must have a Z_MIN endstop in order to enable Auto Bed Leveling feature!!! Z_MIN_PIN must point to a valid hardware pin."
             #endif
@@ -2663,23 +2709,43 @@ void process_commands()
       #endif
       #if defined(Y_MIN_PIN) && Y_MIN_PIN > -1
         SERIAL_PROTOCOLPGM(MSG_Y_MIN);
-        SERIAL_PROTOCOLLN(((READ(Y_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
-        SERIAL_PROTOCOLPGM(MSG_Y_MIN);
-        //SERIAL_PROTOCOLLN(((READ(Y2_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #if defined(Y2_MIN_PIN) && Y2_MIN_PIN > -1
+          SERIAL_PROTOCOL(((READ(Y_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+          SERIAL_PROTOCOLPGM(" - ");
+          SERIAL_PROTOCOLLN(((READ(Y2_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #else
+          SERIAL_PROTOCOLLN(((READ(Y_MIN_PIN)^Y_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #endif
       #endif
       #if defined(Y_MAX_PIN) && Y_MAX_PIN > -1
         SERIAL_PROTOCOLPGM(MSG_Y_MAX);
-        SERIAL_PROTOCOLLN(((READ(Y_MAX_PIN)^Y_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #if defined(Y2_MAX_PIN) && Y2_MAX_PIN > -1
+          SERIAL_PROTOCOL(((READ(Y_MAX_PIN)^Y_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+          SERIAL_PROTOCOLPGM(" - ");
+          SERIAL_PROTOCOLLN(((READ(Y2_MAX_PIN)^Y_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #else
+          SERIAL_PROTOCOLLN(((READ(Y_MAX_PIN)^Y_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #endif
       #endif
       #if defined(Z_MIN_PIN) && Z_MIN_PIN > -1
         SERIAL_PROTOCOLPGM(MSG_Z_MIN);
-        SERIAL_PROTOCOLLN(((READ(Z_MIN_PIN)^Z_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #if defined(Z2_MIN_PIN) && Z2_MIN_PIN > -1
+          SERIAL_PROTOCOL(((READ(Z_MIN_PIN)^Z_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+          SERIAL_PROTOCOLPGM(" - ");
+          SERIAL_PROTOCOLLN(((READ(Z2_MIN_PIN)^Z_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #else
+          SERIAL_PROTOCOLLN(((READ(Z_MIN_PIN)^Z_MIN_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+	#endif
       #endif
       #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
         SERIAL_PROTOCOLPGM(MSG_Z_MAX);
-        SERIAL_PROTOCOLLN(((READ(Z_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
-        SERIAL_PROTOCOLPGM(MSG_Z_MAX);
-        //SERIAL_PROTOCOLLN(((READ(Z2_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #if defined(Z2_MAX_PIN) && Z2_MAX_PIN > -1
+          SERIAL_PROTOCOL(((READ(Z_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+          SERIAL_PROTOCOLPGM(" - ");
+          SERIAL_PROTOCOLLN(((READ(Z2_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #else
+          SERIAL_PROTOCOLLN(((READ(Z_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+        #endif
       #endif
       break;
       //TODO: update for all axis, use for loop

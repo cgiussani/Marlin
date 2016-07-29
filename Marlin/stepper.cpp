@@ -718,6 +718,12 @@ ISR(TIMER1_COMPA_vect)
       step_loops = step_loops_nominal;
     }
 
+    // Reset extrusion counter
+#ifdef USE_FILAMENT_DETECTION
+    if (READ(FIL_DETECT_PIN) != 0){
+        fd_count = 0;
+    }
+#endif
     // If current block is finished, reset pointer
     if (step_events_completed >= current_block->step_event_count) {
 
