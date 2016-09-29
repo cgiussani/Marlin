@@ -449,6 +449,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
     #define FILAMENTCHANGE_FIRSTRETRACT -2
     #define FILAMENTCHANGE_FINALRETRACT -40
     #define FILAMENTCHANGE_FEEDRATE 600
+    #define FILAMENTCHANGE_EXTRUSION_TIMEOUT 300
   #endif
 #endif
 

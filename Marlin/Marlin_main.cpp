@@ -3320,6 +3320,10 @@ void process_commands()
 	#ifdef USE_FILAMENT_DETECTION
         bool old_detect_filament = detect_filament;
         detect_filament = false;
+        if ( forced_M600 == true ) {
+            SERIAL_ECHO_START;
+            SERIAL_ECHOLNPGM("EVENT_FORCED_M600");
+        }
 	#endif
         float target[4];
         float lastpos[4];
@@ -3453,8 +3457,18 @@ void process_commands()
           lcd_update();
         }
        
+        // Prevent unlimited extrusion in case of error
+        unsigned long extrusion_timeout = (unsigned long) FILAMENTCHANGE_EXTRUSION_TIMEOUT * 1000UL;
+        if(code_seen('S'))
+        {
+            extrusion_timeout = (unsigned long) code_value() * 1000UL;
+        }
+
         delay(500); 
         LCD_MESSAGEPGM(MSG_LOAD_SINGLE);
+        unsigned long extrusion_start = millis();
+        int extrude = 1;
+
 #ifdef USE_EXTERNAL_CLICK
         sendM613Click( true );
 #endif
@@ -3464,9 +3478,18 @@ void process_commands()
           manage_inactivity();
           lcd_update();
 
-          target[E_AXIS]+=0.5;
-          plan_buffer_line(target[X_AXIS], target[Y_AXIS], target[Z_AXIS], target[E_AXIS], feedrate/100, active_extruder);
-
+          // Prevent unlimited extrusion in case of error
+          if (extrude > 0){
+              target[E_AXIS]+=0.5;
+              plan_buffer_line(target[X_AXIS], target[Y_AXIS], target[Z_AXIS], target[E_AXIS], feedrate/100, active_extruder);
+              if (millis() - extrusion_start >= extrusion_timeout){
+                  LCD_MESSAGEPGM("Extrusion stopped");
+          #ifdef USE_EXTERNAL_CLICK
+                  sendM613Click( true );
+          #endif
+                  extrude = 0;
+              }
+          }
         }
 #ifdef USE_EXTERNAL_CLICK
         sendM613Click( false );
