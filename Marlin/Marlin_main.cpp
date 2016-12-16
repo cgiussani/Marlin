@@ -1225,7 +1225,7 @@ static void clean_up_after_endstop_move() {
 #ifdef ENDSTOPS_ONLY_FOR_HOMING
     enable_endstops(false);
 #endif
-
+    endstops_hit_on_purpose();
     feedrate = saved_feedrate;
     feedmultiply = saved_feedmultiply;
     previous_millis_cmd = millis();
@@ -1385,7 +1385,7 @@ static void homeaxis(int axis) {
           lcd_update();
           if ( HOME_Z_COND==1 ) {
             WRITE(Z_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
-             for ( i=0; i<400; i++ ) {
+             for ( i=0; i<(axis_steps_per_unit[Z_AXIS]*DUAL_AXIS_MIN_LEVELING); i++ ) {
                 delay(1); 
                 WRITE(Z_STEP_PIN, !INVERT_Z_STEP_PIN);
                 WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
@@ -1397,7 +1397,7 @@ static void homeaxis(int axis) {
           lcd_update();
           if ( HOME_Z2_COND==1 ) {
             WRITE(Z2_DIR_PIN,HOME_Z_DUAL_DIR_PIN);
-            for ( i=0; i<400; i++) {
+            for ( i=0; i<(axis_steps_per_unit[Z_AXIS]*DUAL_AXIS_MIN_LEVELING); i++) {
               delay(1); 
               WRITE(Z2_STEP_PIN, !INVERT_Z_STEP_PIN);
               WRITE(Z2_STEP_PIN, INVERT_Z_STEP_PIN);
@@ -1440,7 +1440,7 @@ static void homeaxis(int axis) {
           lcd_update();
           if ( HOME_Y_COND==1 ) {
             WRITE(Y_DIR_PIN,HOME_Y_DUAL_DIR_PIN);
-             for ( i=0; i<40; i++ ) {
+             for ( i=0; i<(axis_steps_per_unit[Y_AXIS]*DUAL_AXIS_MIN_LEVELING); i++ ) {
                 delay(1); 
                 WRITE(Y_STEP_PIN, !INVERT_Y_STEP_PIN);
                 WRITE(Y_STEP_PIN, INVERT_Y_STEP_PIN);
@@ -1452,7 +1452,7 @@ static void homeaxis(int axis) {
           lcd_update();
           if ( HOME_Y2_COND==1 ) {
             WRITE(Y2_DIR_PIN,!(HOME_Y_DUAL_DIR_PIN == INVERT_Y2_VS_Y_DIR));
-            for ( i=0; i<40; i++) {
+            for ( i=0; i<(axis_steps_per_unit[Y_AXIS]*DUAL_AXIS_MIN_LEVELING); i++) {
               delay(1); 
               WRITE(Y2_STEP_PIN, !INVERT_Y_STEP_PIN);
               WRITE(Y2_STEP_PIN, INVERT_Y_STEP_PIN);

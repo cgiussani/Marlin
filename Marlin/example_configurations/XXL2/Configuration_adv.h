@@ -158,13 +158,13 @@
 // Only a few motherboards support this, like RAMPS, which have dual extruder support (the 2nd, often unused, extruder driver is used
 // to control the 2nd Z axis stepper motor). The pins are currently only defined for a RAMPS motherboards.
 // On a RAMPS (or other 5 driver) motherboard, using this feature will limit you to using 1 extruder.
-//#define Z_DUAL_STEPPER_DRIVERS
+#define Z_DUAL_STEPPER_DRIVERS
 
 #ifdef Z_DUAL_STEPPER_DRIVERS
   #undef EXTRUDERS
   #define EXTRUDERS 1
-  #define Z2_MAX_PIN 36
-  #define Z2_MIN_PIN 33 
+  #define Z2_MAX_PIN -1
+  #define Z2_MIN_PIN 36 
 #endif
 
 // Same again but for Y Axis.
@@ -183,7 +183,7 @@
 //#endif
 
 #if defined (Z_DUAL_STEPPER_DRIVERS) || defined (Y_DUAL_STEPPER_DRIVERS)
-  #define AUTOHOME_DUAL_TIMEOUT 10000 // timeout (ms) between different endstop hit on dual stepper axis homing
+  #define AUTOHOME_DUAL_TIMEOUT 5000 // timeout (ms) between different endstop hit on dual stepper axis homing
   #define DUAL_AXIS_MIN_LEVELING 0.1 // minimum movement (mm) while leveling dual stepper axis
 #endif
 
@@ -274,7 +274,7 @@
 // Frequency limit
 // See nophead's blog for more info
 // Not working O
-#define XY_FREQUENCY_LIMIT  15 //100 sharebot originale
+//#define XY_FREQUENCY_LIMIT  15 //100 sharebot originale
 
 // Minimum planner junction speed. Sets the default minimum speed the planner plans for at the end
 // of the buffer and all stops. This should not be much greater than zero and should only be changed
@@ -444,8 +444,8 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 #ifdef ULTIPANEL
   #define FILAMENTCHANGEENABLE
   #ifdef FILAMENTCHANGEENABLE
-    #define FILAMENTCHANGE_XPOS 10
-    #define FILAMENTCHANGE_YPOS 210
+    #define FILAMENTCHANGE_XPOS 5
+    #define FILAMENTCHANGE_YPOS 5
     #define FILAMENTCHANGE_ZADD 50
     #define FILAMENTCHANGE_FIRSTRETRACT -2
     #define FILAMENTCHANGE_FINALRETRACT -40
@@ -463,9 +463,9 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 // Pause/Resume
 #define PAUSERESUME_FEEDRATE 600
 #define PAUSERESUME_RETRACT -3
-#define PAUSERESUME_XPOS 20
-#define PAUSERESUME_YPOS 180
-#define PAUSERESUME_ZADD 20
+#define PAUSERESUME_XPOS 5
+#define PAUSERESUME_YPOS 5
+#define PAUSERESUME_ZADD 50
 
 //===========================================================================
 //=============================  Define Defines  ============================

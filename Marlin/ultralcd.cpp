@@ -84,6 +84,7 @@ static void menu_action_function(menuFunc_t data);
 static void menu_action_sdfile(const char* filename, char* longFilename);
 static void menu_action_sddirectory(const char* filename, char* longFilename);
 static void menu_action_setting_edit_bool(const char* pstr, bool* ptr);
+static void menu_action_setting_edit_bool(const char* pstr, volatile bool* ptr);
 static void menu_action_setting_edit_int3(const char* pstr, int* ptr, int minValue, int maxValue);
 static void menu_action_setting_edit_float3(const char* pstr, float* ptr, float minValue, float maxValue);
 static void menu_action_setting_edit_float32(const char* pstr, float* ptr, float minValue, float maxValue);
@@ -270,8 +271,11 @@ static void lcd_sdcard_stop()
     lcd_cooldown();
     clear_command_queue();
 
-    //enquecommand_P((PSTR("G0 Z200 F1000"))); // fabio cambio stop
+#if Z_HOME_DIR > 0
     enquecommand_P((PSTR("G28 Z")));
+#else
+    enquecommand_P((PSTR("G0 Z200 F1000")));
+#endif
     enquecommand_P((PSTR("G28 X Y"))); // move all axis home
     enquecommand_P((PSTR("M106 S0")));
 
@@ -335,12 +339,29 @@ static void lcd_triptime_stats()
   END_MENU();
 }
 
+static void lcd_lastprint_stats()
+{
+    unsigned long int i;
+    START_MENU();
+    MENU_ITEM(back, MSG_WATCH, lcd_stats_menu);
+    print_lifetime_row( last_print_minutes, 1 );
+
+    i = last_print_centimeters;
+    lcd.setCursor(0, 3);
+    lcd_printPGM(PSTR(MSG_STATS_FILAMENT));
+    lcd.setCursor(12, 3);
+    lcd.print( ftostr5((float)i/100.0) );
+    lcd_printPGM(PSTR(" m"));
+    END_MENU();
+}
+
 static void lcd_stats_menu()
 {
   START_MENU();
   MENU_ITEM(back, MSG_WATCH, lcd_main_menu);
   MENU_ITEM(submenu, MSG_STATSMENU_LIFETIME, lcd_lifetime_stats);
   MENU_ITEM(submenu, MSG_STATSMENU_TRIPTIME, lcd_triptime_stats);
+  MENU_ITEM(submenu, MSG_STATSMENU_LAST, lcd_lastprint_stats);
   MENU_ITEM(function, MSG_STATSMENU_RESET, reset_triptime );
   END_MENU();
 }
@@ -520,10 +541,10 @@ static void lcd_tune_menu()
     MENU_ITEM(submenu, MSG_BABYSTEP_Z, lcd_babystep_z);
 #endif
 #ifdef FILAMENTCHANGEENABLE
-    MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600 X10 Y210")); // Fabio
+    MENU_ITEM(gcode, MSG_FILAMENTCHANGE, PSTR("M600 X10 Y210"));
 #endif
 #ifdef USE_FILAMENT_DETECTION
-    //MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
+    MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
 #endif
     END_MENU();
 }
@@ -720,7 +741,7 @@ static void lcd_prepare_menu()
 #endif
 
 #ifdef USE_FILAMENT_DETECTION
-    //MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
+    MENU_ITEM_EDIT( bool, MSG_FILAMENT_DETECTION, &detect_filament );
 #endif
 
     END_MENU();
@@ -1361,6 +1382,10 @@ static void menu_action_sddirectory(const char* filename, char* longFilename)
     encoderPosition = 0;
 }
 static void menu_action_setting_edit_bool(const char* pstr, bool* ptr)
+{
+    *ptr = !(*ptr);
+}
+static void menu_action_setting_edit_bool(const char* pstr, volatile bool* ptr)
 {
     *ptr = !(*ptr);
 }
