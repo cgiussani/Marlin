@@ -3092,6 +3092,7 @@ void process_commands()
         #endif
 
         updatePID();
+        SERIAL_PROTOCOL("echo:");
         SERIAL_PROTOCOL(MSG_OK);
         SERIAL_PROTOCOL(" p:");
         SERIAL_PROTOCOL(Kp);
@@ -3116,6 +3117,7 @@ void process_commands()
         if(code_seen('D')) bedKd = scalePID_d(code_value());
 
         updatePID();
+        SERIAL_PROTOCOL("echo:");
         SERIAL_PROTOCOL(MSG_OK);
         SERIAL_PROTOCOL(" p:");
         SERIAL_PROTOCOL(bedKp);
